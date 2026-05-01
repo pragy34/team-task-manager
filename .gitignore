@@ -37,4 +37,4 @@ Thumbs.db
 *.swp
 
 # Accidental scaffold artifact
-{backend/
+[{]backend/
