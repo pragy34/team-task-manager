@@ -1,6 +1,21 @@
 # TaskFlow — Team Task Manager
 
-A full-stack team task management application with role-based access control, built with **React + FastAPI + PostgreSQL**.
+A production-ready, full-stack collaboration platform for teams to plan work, track progress, and deliver faster with confidence.
+
+Built with **React + FastAPI + PostgreSQL** using modern architecture, role-based access control, and a clean Kanban-first UX.
+
+---
+
+## 🌐 Live Production Deployment
+
+TaskFlow is fully deployed and running on Render:
+
+- Live App: `https://team-task-manager-1-l6jn.onrender.com`
+- Backend API: `https://team-task-manager-ls05.onrender.com`
+- API Docs: `https://team-task-manager-ls05.onrender.com/docs`
+- Health Check: `https://team-task-manager-ls05.onrender.com/health`
+
+> Status: **Live and operational**
 
 ---
 
@@ -177,36 +192,56 @@ npm run dev
 
 ---
 
-## ☁️ Deployment on Railway
+## ☁️ Deployment on Render
 
-### Step 1 — Database
-1. Go to [railway.app](https://railway.app) → New Project → **PostgreSQL**
-2. Copy the `DATABASE_URL` from the Variables tab
+### Why Render for this project?
+- Simple setup for full-stack apps
+- Managed PostgreSQL in the same platform
+- Clean GitHub-based CI/CD workflow
+- Easy environment variable management
 
-### Step 2 — Backend Service
-1. Add Service → **Deploy from GitHub repo** → select `backend/` folder (or root with Dockerfile path set)
-2. Set environment variables:
+### 1) Create PostgreSQL database
+1. In Render Dashboard: **New** → **PostgreSQL**
+2. Use defaults (or choose your preferred name/region)
+3. After creation, copy the **Internal Database URL**
+
+### 2) Deploy Backend (`backend/`)
+1. **New** → **Web Service** → connect this GitHub repository
+2. Set **Root Directory** to `backend`
+3. Deploy type: Docker (uses existing `backend/Dockerfile`)
+4. Add environment variables:
    ```
-   DATABASE_URL=<from step 1>
-   JWT_SECRET=<generate a long random string>
+   DATABASE_URL=<Render Internal Database URL>
+   JWT_SECRET=<a long random secret>
    ALGORITHM=HS256
    ACCESS_TOKEN_EXPIRE_MINUTES=1440
    ```
-3. Railway auto-detects `railway.toml` and uses the Dockerfile
+5. Deploy and verify:
+   - `/health` returns healthy response
+   - `/docs` opens Swagger UI
 
-### Step 3 — Frontend Service
-1. Add another Service → GitHub repo → `frontend/` folder
-2. Set environment variable:
+### 3) Deploy Frontend (`frontend/`)
+1. **New** → **Static Site** → same repository
+2. Set **Root Directory** to `frontend`
+3. Build Command:
+   ```bash
+   npm install && npm run build
    ```
-   VITE_API_URL=https://<your-backend-railway-url>/api/v1
+4. Publish Directory:
+   ```bash
+   dist
    ```
-   > ⚠️ You must **rebuild** the frontend after setting `VITE_API_URL` since Vite bakes it in at build time.
+5. Add environment variable:
+   ```
+   VITE_API_URL=https://team-task-manager-ls05.onrender.com/api/v1
+   ```
+6. Redeploy after setting env vars (required for Vite)
 
-### Step 4 — CORS (Production)
-In `backend/main.py`, update `allow_origins`:
-```python
-allow_origins=["https://your-frontend-railway-url.up.railway.app"]
-```
+### 4) Final production checklist
+- Backend is reachable at `/health`
+- Frontend can register/login successfully
+- API calls from frontend resolve to deployed backend URL
+- CORS is restricted to your frontend domain in production
 
 ---
 
